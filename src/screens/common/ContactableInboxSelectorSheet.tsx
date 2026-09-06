@@ -1,9 +1,14 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { ActivityIndicator, I18nManager, Pressable, View } from 'react-native';
-import { BottomSheetModal, useBottomSheetSpringConfigs } from '@gorhom/bottom-sheet';
+import {
+  BottomSheetBackdrop,
+  BottomSheetModal,
+  BottomSheetView,
+  useBottomSheetSpringConfigs,
+} from '@gorhom/bottom-sheet';
+import type { BottomSheetBackdropProps } from '@gorhom/bottom-sheet';
 import Animated from 'react-native-reanimated';
 
-import { BottomSheetBackdrop, BottomSheetWrapper } from '@/components-next';
 import { tailwind } from '@/theme';
 
 export type ContactableInbox = {
@@ -37,6 +42,13 @@ export const ContactableInboxSelectorSheet = ({
     damping: 30,
   });
 
+  const renderBackdrop = useCallback(
+    (backdropProps: BottomSheetBackdropProps) => (
+      <BottomSheetBackdrop {...backdropProps} appearsOnIndex={0} disappearsOnIndex={-1} />
+    ),
+    [],
+  );
+
   const sortedInboxes = useMemo(
     () => [...inboxes].sort((current, next) => current.name.localeCompare(next.name)),
     [inboxes],
@@ -58,7 +70,7 @@ export const ContactableInboxSelectorSheet = ({
   return (
     <BottomSheetModal
       ref={sheetRef}
-      backdropComponent={BottomSheetBackdrop}
+      backdropComponent={renderBackdrop}
       handleIndicatorStyle={tailwind.style('overflow-hidden bg-blackA-A6 w-8 h-1 rounded-[11px]')}
       enablePanDownToClose
       onDismiss={onClose}
@@ -66,7 +78,7 @@ export const ContactableInboxSelectorSheet = ({
       handleStyle={tailwind.style('p-0 h-4 pt-[5px]')}
       style={tailwind.style('rounded-[26px] overflow-hidden')}
       snapPoints={['46%']}>
-      <BottomSheetWrapper>
+      <BottomSheetView>
         <Animated.View style={tailwind.style('px-4 pt-2 pb-6')}>
           <Animated.Text style={tailwind.style('text-base font-inter-580-24 text-gray-950 pb-3')}>
             {title}
@@ -114,7 +126,7 @@ export const ContactableInboxSelectorSheet = ({
               );
             })}
         </Animated.View>
-      </BottomSheetWrapper>
+      </BottomSheetView>
     </BottomSheetModal>
   );
 };
