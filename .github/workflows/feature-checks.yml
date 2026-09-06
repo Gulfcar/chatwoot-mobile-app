@@ -3,7 +3,8 @@ name: Feature checks
 on:
   push:
     branches:
-      - feature/contacts-start-conversation
+      - gulfcar
+      - 'feature/**'
   pull_request:
     branches:
       - gulfcar
