@@ -1,10 +1,11 @@
 import React, { useEffect, useMemo, useRef } from 'react';
-import { ActivityIndicator, I18nManager, Pressable, ScrollView, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 
 import { BottomSheetHeader } from '@/components-next';
 import { Sheet, type SheetRef } from '@/components-next/common/sheet/Sheet';
 import { tailwind } from '@/theme';
+import i18n from '@/i18n';
 
 export type ContactableInbox = {
   id: number;
@@ -45,10 +46,8 @@ export const ContactableInboxSelectorSheet = ({
     }
   }, [visible]);
 
-  const title = I18nManager.isRTL ? 'اختر صندوق الوارد' : 'Choose inbox';
-  const empty = I18nManager.isRTL
-    ? 'لا توجد قناة متاحة لبدء محادثة مع جهة الاتصال.'
-    : 'No inbox is available to start a conversation with this contact.';
+  const title = i18n.t('CONTACT_DETAILS.CHOOSE_INBOX');
+  const empty = i18n.t('CONTACT_DETAILS.NO_INBOX_AVAILABLE');
 
   return (
     <Sheet ref={sheetRef} detents={[0.46]} scrollable onDismiss={onClose}>

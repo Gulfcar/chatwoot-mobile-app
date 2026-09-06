@@ -272,7 +272,6 @@
       }
     }
   },
-
   "FILTER": {
     "ALL_INBOXES": "All inboxes",
     "FILTER_BY_ASSIGNEE_TYPE": "Filter by assignee type",
@@ -382,7 +381,13 @@
     "LOCATION": "Location",
     "COMPANY": "Company",
     "CONTACT_ATTRIBUTES": "Contact Attributes",
-    "VALUE_UNAVAILABLE": "Unavailable"
+    "VALUE_UNAVAILABLE": "Unavailable",
+    "MESSAGE": "Message",
+    "CHOOSE_INBOX": "Choose inbox",
+    "NO_INBOX_AVAILABLE": "No inbox is available to start a conversation with this contact.",
+    "NO_INBOX_TO_MESSAGE": "No inbox is available to message this contact.",
+    "LOAD_INBOXES_FAILED": "Unable to load contactable inboxes.",
+    "START_CONVERSATION_FAILED": "Unable to start the conversation. Please try again."
   },
   "CONVERSATION_PARTICIPANTS": {
     "TITLE": "Participants",
