@@ -1,17 +1,21 @@
 import { ConfigContext, ExpoConfig } from 'expo/config';
 
+const defaultChatwootBaseUrl = 'https://support.gulfcar.com.sa';
+const chatwootBaseUrl = process.env.EXPO_PUBLIC_CHATWOOT_BASE_URL || defaultChatwootBaseUrl;
+const chatwootHost = new URL(chatwootBaseUrl).hostname;
+
 export default ({ config }: ConfigContext): ExpoConfig => {
   return {
-    name: 'Chatwoot',
-    slug: process.env.EXPO_PUBLIC_APP_SLUG || 'chatwoot-mobile',
+    name: 'GC Support',
+    slug: process.env.EXPO_PUBLIC_APP_SLUG || 'gc-support',
     version: '4.9.3',
     orientation: 'portrait',
     icon: './assets/icon.png',
     userInterfaceStyle: 'light',
-    scheme: 'chatwootapp',
+    scheme: 'gcsupport',
     ios: {
       supportsTablet: true,
-      bundleIdentifier: 'com.chatwoot.app',
+      bundleIdentifier: 'com.gulfcar.support',
       infoPlist: {
         NSCameraUsageDescription:
           'This app requires access to the camera to upload images and videos.',
@@ -23,20 +27,23 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         UIBackgroundModes: ['fetch', 'remote-notification'],
         ITSAppUsesNonExemptEncryption: false,
       },
-      // Please use the relative path to the google-services.json file
+      // Please use the relative path to the GoogleService-Info.plist file.
       googleServicesFile: process.env.EXPO_PUBLIC_IOS_GOOGLE_SERVICES_FILE,
       entitlements: { 'aps-environment': 'production' },
-      associatedDomains: ['applinks:app.chatwoot.com'],
+      associatedDomains: [`applinks:${chatwootHost}`],
     },
     android: {
-      adaptiveIcon: { foregroundImage: './assets/adaptive-icon.png', backgroundColor: '#ffffff' },
-      package: 'com.chatwoot.app',
+      adaptiveIcon: {
+        foregroundImage: './assets/adaptive-icon.png',
+        backgroundColor: '#011E4F',
+      },
+      package: 'com.gulfcar.support',
       permissions: [
         'android.permission.CAMERA',
         'android.permission.RECORD_AUDIO',
         'android.permission.POST_NOTIFICATIONS',
       ],
-      // Please use the relative path to the google-services.json file
+      // Please use the relative path to the google-services.json file.
       googleServicesFile: process.env.EXPO_PUBLIC_ANDROID_GOOGLE_SERVICES_FILE,
       intentFilters: [
         {
@@ -45,7 +52,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
           data: [
             {
               scheme: 'https',
-              host: 'app.chatwoot.com',
+              host: chatwootHost,
               pathPrefix: '/app/accounts/',
               pathPattern: '/*/conversations/*',
             },
@@ -56,7 +63,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
           action: 'VIEW',
           data: [
             {
-              scheme: 'chatwootapp',
+              scheme: 'gcsupport',
             },
           ],
           category: ['BROWSABLE', 'DEFAULT'],
@@ -69,7 +76,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         storybookEnabled: process.env.EXPO_STORYBOOK_ENABLED,
       },
     },
-    owner: 'chatwoot',
     plugins: [
       'expo-font',
       'expo-image',
@@ -79,7 +85,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         {
           image: './assets/splash.png',
           resizeMode: 'contain',
-          backgroundColor: '#ffffff',
+          backgroundColor: '#011E4F',
           enableFullScreenImage_legacy: true,
         },
       ],
@@ -102,7 +108,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       [
         'expo-build-properties',
         {
-          // compileSdk/targetSdk 36 = Expo SDK 54 / RN 0.81 default (Android 16).
+          // compileSdk/targetSdk 36 = Expo SDK 57 / RN 0.86 default (Android 16).
           // notifee (issue #808) needs compileSdk >= 35, satisfied by 36.
           android: {
             minSdkVersion: 24,
@@ -117,6 +123,5 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       './with-notifee-maven-repo.js',
       './with-ios-modular-headers.js',
     ],
-    androidNavigationBar: { backgroundColor: '#ffffff' },
   };
 };
