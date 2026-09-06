@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Dimensions, I18nManager, Linking, Pressable } from 'react-native';
+import { Dimensions, Linking, Pressable } from 'react-native';
 import { StackActions, useNavigation, useRoute } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
 import Animated from 'react-native-reanimated';
@@ -89,11 +89,11 @@ export const ContactBasicActions = (props: ContactBasicActionsProps) => {
   const [contactableInboxes, setContactableInboxes] = useState<ContactableInbox[]>([]);
 
   const onCallPress = () => {
-    openNumber({ phoneNumber });
+    openNumber({ phoneNumber: phoneNumber || '' });
   };
 
   const onEmailPress = () => {
-    openEmail({ email });
+    openEmail({ email: email || '' });
   };
 
   const openSystemSms = () => {
@@ -126,9 +126,7 @@ export const ContactBasicActions = (props: ContactBasicActionsProps) => {
       openChatScreen(conversation.id);
     } catch {
       showToast({
-        message: I18nManager.isRTL
-          ? 'تعذر بدء المحادثة. حاول مرة أخرى.'
-          : 'Unable to start the conversation. Please try again.',
+        message: i18n.t('CONTACT_DETAILS.START_CONVERSATION_FAILED'),
       });
     }
   };
@@ -156,9 +154,7 @@ export const ContactBasicActions = (props: ContactBasicActionsProps) => {
       if (!inboxes.length) {
         setSelectorVisible(false);
         showToast({
-          message: I18nManager.isRTL
-            ? 'لا توجد قناة متاحة لبدء رسالة مع جهة الاتصال.'
-            : 'No inbox is available to message this contact.',
+          message: i18n.t('CONTACT_DETAILS.NO_INBOX_TO_MESSAGE'),
         });
         return;
       }
@@ -173,9 +169,7 @@ export const ContactBasicActions = (props: ContactBasicActionsProps) => {
     } catch {
       setSelectorVisible(false);
       showToast({
-        message: I18nManager.isRTL
-          ? 'تعذر تحميل قنوات التواصل.'
-          : 'Unable to load contactable inboxes.',
+        message: i18n.t('CONTACT_DETAILS.LOAD_INBOXES_FAILED'),
       });
     } finally {
       setIsLoadingInboxes(false);
@@ -186,7 +180,7 @@ export const ContactBasicActions = (props: ContactBasicActionsProps) => {
     return null;
   }
 
-  const messageLabel = I18nManager.isRTL ? 'رسالة' : 'Message';
+  const messageLabel = i18n.t('CONTACT_DETAILS.MESSAGE');
   const messageEnabled = !!conversationId || !!contactId || !!phoneNumber;
 
   return (
