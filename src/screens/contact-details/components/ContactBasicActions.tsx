@@ -8,10 +8,7 @@ import { Icon } from '@/components-next';
 import { useAppSelector } from '@/hooks';
 import type { TabBarExcludedScreenParamList } from '@/navigation/tabs/AppTabs';
 import { ContactableInboxSelectorSheet } from '@/screens/common/ContactableInboxSelectorSheet';
-import {
-  ContactMessagingService,
-  type ContactableInbox,
-} from '@/services/ContactMessagingService';
+import { ContactMessagingService, type ContactableInbox } from '@/services/ContactMessagingService';
 import { selectUserId } from '@/store/auth/authSelectors';
 import { ChatIcon, MailIcon, PhoneIcon } from '@/svg-icons';
 import { tailwind } from '@/theme';
