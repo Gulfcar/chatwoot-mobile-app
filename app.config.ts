@@ -2,16 +2,16 @@ import { ConfigContext, ExpoConfig } from 'expo/config';
 
 export default ({ config }: ConfigContext): ExpoConfig => {
   return {
-    name: 'Chatwoot',
-    slug: process.env.EXPO_PUBLIC_APP_SLUG || 'chatwoot-mobile',
+    name: 'GC Support',
+    slug: process.env.EXPO_PUBLIC_APP_SLUG || 'gc-support',
     version: '4.9.3',
     orientation: 'portrait',
     icon: './assets/icon.png',
     userInterfaceStyle: 'light',
-    scheme: 'chatwootapp',
+    scheme: 'gcsupport',
     ios: {
       supportsTablet: true,
-      bundleIdentifier: 'com.chatwoot.app',
+      bundleIdentifier: 'com.gulfcar.support',
       infoPlist: {
         NSCameraUsageDescription:
           'This app requires access to the camera to upload images and videos.',
@@ -30,7 +30,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     },
     android: {
       adaptiveIcon: { foregroundImage: './assets/adaptive-icon.png', backgroundColor: '#ffffff' },
-      package: 'com.chatwoot.app',
+      package: 'com.gulfcar.support',
       permissions: [
         'android.permission.CAMERA',
         'android.permission.RECORD_AUDIO',
@@ -56,7 +56,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
           action: 'VIEW',
           data: [
             {
-              scheme: 'chatwootapp',
+              scheme: 'gcsupport',
             },
           ],
           category: ['BROWSABLE', 'DEFAULT'],
@@ -69,7 +69,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         storybookEnabled: process.env.EXPO_STORYBOOK_ENABLED,
       },
     },
-    owner: 'chatwoot',
     plugins: [
       'expo-font',
       'expo-image',
