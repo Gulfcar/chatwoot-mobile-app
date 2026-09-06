@@ -29,7 +29,10 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       associatedDomains: ['applinks:app.chatwoot.com'],
     },
     android: {
-      adaptiveIcon: { foregroundImage: './assets/adaptive-icon.png', backgroundColor: '#ffffff' },
+      adaptiveIcon: {
+        foregroundImage: './assets/adaptive-icon.png',
+        backgroundColor: '#011E4F',
+      },
       package: 'com.gulfcar.support',
       permissions: [
         'android.permission.CAMERA',
@@ -78,7 +81,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         {
           image: './assets/splash.png',
           resizeMode: 'contain',
-          backgroundColor: '#ffffff',
+          backgroundColor: '#011E4F',
           enableFullScreenImage_legacy: true,
         },
       ],
@@ -116,6 +119,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       './with-notifee-maven-repo.js',
       './with-ios-modular-headers.js',
     ],
-    androidNavigationBar: { backgroundColor: '#ffffff' },
+    androidNavigationBar: { backgroundColor: '#011E4F' },
   };
 };
