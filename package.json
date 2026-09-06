@@ -8,6 +8,7 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "clean": "watchman watch-del-all && yarn cache clean",
+    "typecheck": "tsc --noEmit",
     "test": "jest",
     "lint": "eslint .",
     "generate": "npx expo prebuild --clean",
