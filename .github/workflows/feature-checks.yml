@@ -1,0 +1,51 @@
+name: Feature checks
+
+on:
+  push:
+    branches:
+      - gulfcar
+      - 'feature/**'
+  pull_request:
+    branches:
+      - gulfcar
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.11.0
+          run_install: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint contacts feature
+        run: >-
+          pnpm exec eslint
+          src/navigation/stack/ContactsStack.tsx
+          src/navigation/stack/index.ts
+          src/navigation/tabs/AppTabs.tsx
+          src/navigation/tabs/BottomTabBar.tsx
+          src/screens/common/ContactableInboxSelectorSheet.tsx
+          src/screens/contact-details/components/ContactBasicActions.tsx
+          src/screens/contacts/ContactsScreen.tsx
+          src/services/ContactMessagingService.ts
+          src/services/ContactMessagingService.spec.ts
+          src/svg-icons/tabs/ContactsIcon.tsx
+          src/svg-icons/tabs/index.ts
+
+      - name: Run tests
+        run: pnpm test --runInBand
