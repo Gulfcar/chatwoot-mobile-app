@@ -41,6 +41,8 @@ jobs:
           src/screens/common/ContactableInboxSelectorSheet.tsx
           src/screens/contact-details/components/ContactBasicActions.tsx
           src/screens/contacts/ContactsScreen.tsx
+          src/services/ContactMessagingService.ts
+          src/services/ContactMessagingService.spec.ts
           src/svg-icons/tabs/ContactsIcon.tsx
           src/svg-icons/tabs/index.ts
 
