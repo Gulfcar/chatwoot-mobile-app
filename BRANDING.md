@@ -11,7 +11,7 @@
 
 ## Approved asset usage
 
-Use the approved GC Support visual treatment for the native assets:
+The final native assets are committed on this branch:
 
 - `assets/icon.png`: gold Gulf Car emblem on the deep-navy background for launcher/store icon usage.
 - `assets/adaptive-icon.png`: transparent gold emblem foreground; Android supplies `#011E4F` as the adaptive-icon background.
@@ -21,10 +21,12 @@ Use the approved GC Support visual treatment for the native assets:
 
 The mobile config derives the iOS associated domain and Android HTTPS intent-filter host from `EXPO_PUBLIC_CHATWOOT_BASE_URL`, defaulting to `support.gulfcar.com.sa`.
 
-Server-side verification is still required before verified universal/app links work in release builds:
+The verification files already served by `support.gulfcar.com.sa` are **not valid for GC Support yet**. They currently identify the old Chatwoot app (`com.chatwoot.app`) and must be replaced before verified universal/app links are considered configured.
 
-- iOS: publish `/.well-known/apple-app-site-association` for `com.gulfcar.support` and the final Apple Team ID.
-- Android: publish `/.well-known/assetlinks.json` for `com.gulfcar.support` and the final signing certificate SHA-256 fingerprint.
+Required release values:
+
+- iOS `/.well-known/apple-app-site-association`: use `<APPLE_TEAM_ID>.com.gulfcar.support` for the GC Support app ID.
+- Android `/.well-known/assetlinks.json`: use package `com.gulfcar.support` and the SHA-256 fingerprint of the final GC Support Android signing certificate.
 
 The custom scheme `gcsupport://` remains available independently of domain verification.
 
@@ -32,5 +34,5 @@ The custom scheme `gcsupport://` remains available independently of domain verif
 
 - Create the Firebase Android app using `com.gulfcar.support` and add `google-services.json` locally/secrets as appropriate.
 - Create the Firebase iOS app using `com.gulfcar.support` and add `GoogleService-Info.plist` locally/secrets as appropriate.
-- Complete the server-side iOS/Android app-link verification files above.
+- Replace the existing server-side iOS/Android app-link verification files with the GC Support identities above.
 - Link the project to the Gulf Car Expo/EAS account and set the final EAS project ID.
