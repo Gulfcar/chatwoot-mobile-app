@@ -82,9 +82,12 @@ const ContactsScreen = () => {
   );
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      loadContacts(query);
-    }, query.trim().length ? 300 : 0);
+    const timeout = setTimeout(
+      () => {
+        loadContacts(query);
+      },
+      query.trim().length ? 300 : 0,
+    );
 
     return () => clearTimeout(timeout);
   }, [loadContacts, query]);
