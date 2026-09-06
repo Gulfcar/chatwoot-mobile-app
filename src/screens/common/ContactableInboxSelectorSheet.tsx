@@ -1,14 +1,9 @@
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { ActivityIndicator, I18nManager, Pressable, View } from 'react-native';
-import {
-  BottomSheetBackdrop,
-  BottomSheetModal,
-  BottomSheetView,
-  useBottomSheetSpringConfigs,
-} from '@gorhom/bottom-sheet';
-import type { BottomSheetBackdropProps } from '@gorhom/bottom-sheet';
+import React, { useEffect, useMemo, useRef } from 'react';
+import { ActivityIndicator, I18nManager, Pressable, ScrollView, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 
+import { BottomSheetHeader } from '@/components-next';
+import { Sheet, type SheetRef } from '@/components-next/common/sheet/Sheet';
 import { tailwind } from '@/theme';
 
 export type ContactableInbox = {
@@ -35,19 +30,7 @@ export const ContactableInboxSelectorSheet = ({
   onSelect,
   onClose,
 }: ContactableInboxSelectorSheetProps) => {
-  const sheetRef = useRef<BottomSheetModal>(null);
-  const animationConfigs = useBottomSheetSpringConfigs({
-    mass: 1,
-    stiffness: 420,
-    damping: 30,
-  });
-
-  const renderBackdrop = useCallback(
-    (backdropProps: BottomSheetBackdropProps) => (
-      <BottomSheetBackdrop {...backdropProps} appearsOnIndex={0} disappearsOnIndex={-1} />
-    ),
-    [],
-  );
+  const sheetRef = useRef<SheetRef>(null);
 
   const sortedInboxes = useMemo(
     () => [...inboxes].sort((current, next) => current.name.localeCompare(next.name)),
@@ -58,7 +41,7 @@ export const ContactableInboxSelectorSheet = ({
     if (visible) {
       sheetRef.current?.present();
     } else {
-      sheetRef.current?.dismiss({ overshootClamping: true });
+      sheetRef.current?.dismiss();
     }
   }, [visible]);
 
@@ -68,22 +51,10 @@ export const ContactableInboxSelectorSheet = ({
     : 'No inbox is available to start a conversation with this contact.';
 
   return (
-    <BottomSheetModal
-      ref={sheetRef}
-      backdropComponent={renderBackdrop}
-      handleIndicatorStyle={tailwind.style('overflow-hidden bg-blackA-A6 w-8 h-1 rounded-[11px]')}
-      enablePanDownToClose
-      onDismiss={onClose}
-      animationConfigs={animationConfigs}
-      handleStyle={tailwind.style('p-0 h-4 pt-[5px]')}
-      style={tailwind.style('rounded-[26px] overflow-hidden')}
-      snapPoints={['46%']}>
-      <BottomSheetView>
+    <Sheet ref={sheetRef} detents={[0.46]} scrollable onDismiss={onClose}>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <BottomSheetHeader headerText={title} />
         <Animated.View style={tailwind.style('px-4 pt-2 pb-6')}>
-          <Animated.Text style={tailwind.style('text-base font-inter-580-24 text-gray-950 pb-3')}>
-            {title}
-          </Animated.Text>
-
           {isLoading ? (
             <View style={tailwind.style('items-center justify-center py-10')}>
               <ActivityIndicator />
@@ -126,7 +97,7 @@ export const ContactableInboxSelectorSheet = ({
               );
             })}
         </Animated.View>
-      </BottomSheetView>
-    </BottomSheetModal>
+      </ScrollView>
+    </Sheet>
   );
 };
