@@ -17,23 +17,10 @@ import { SearchBar } from '@/components-next/common/search';
 import { TAB_BAR_HEIGHT } from '@/constants';
 import { useAppDispatch } from '@/hooks';
 import i18n from 'i18n';
-import { apiService } from '@/services/APIService';
+import { ContactMessagingService } from '@/services/ContactMessagingService';
 import { addContact, addContacts } from '@/store/contact/contactSlice';
 import { tailwind } from '@/theme';
 import type { Contact } from '@/types/Contact';
-import { transformContact } from '@/utils/camelCaseKeys';
-
-type ContactsResponse = {
-  payload?: Contact[] | { contacts?: Contact[] };
-};
-
-const normalizeContacts = (response: ContactsResponse): Contact[] => {
-  if (Array.isArray(response.payload)) {
-    return response.payload.map(transformContact);
-  }
-
-  return (response.payload?.contacts || []).map(transformContact);
-};
 
 const getSubtitle = (contact: Contact) =>
   contact.phoneNumber || contact.email || contact.additionalAttributes?.companyName || '';
@@ -57,17 +44,7 @@ const ContactsScreen = () => {
       setHasError(false);
 
       try {
-        const trimmedQuery = searchQuery.trim();
-        const response =
-          trimmedQuery.length >= 2
-            ? await apiService.get<ContactsResponse>('search/contacts', {
-                params: { q: trimmedQuery, page: 1 },
-              })
-            : await apiService.get<ContactsResponse>('contacts', {
-                params: { page: 1, sort: '-created_at', include_contact_inboxes: false },
-              });
-
-        const nextContacts = normalizeContacts(response.data);
+        const nextContacts = await ContactMessagingService.getContacts(searchQuery);
         setContacts(nextContacts);
         dispatch(addContacts({ contacts: nextContacts }));
       } catch {
