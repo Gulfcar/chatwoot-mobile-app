@@ -1,5 +1,9 @@
 import { ConfigContext, ExpoConfig } from 'expo/config';
 
+const defaultChatwootBaseUrl = 'https://support.gulfcar.com.sa';
+const chatwootBaseUrl = process.env.EXPO_PUBLIC_CHATWOOT_BASE_URL || defaultChatwootBaseUrl;
+const chatwootHost = new URL(chatwootBaseUrl).hostname;
+
 export default ({ config }: ConfigContext): ExpoConfig => {
   return {
     name: 'GC Support',
@@ -23,10 +27,10 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         UIBackgroundModes: ['fetch', 'remote-notification'],
         ITSAppUsesNonExemptEncryption: false,
       },
-      // Please use the relative path to the google-services.json file
+      // Please use the relative path to the GoogleService-Info.plist file.
       googleServicesFile: process.env.EXPO_PUBLIC_IOS_GOOGLE_SERVICES_FILE,
       entitlements: { 'aps-environment': 'production' },
-      associatedDomains: ['applinks:app.chatwoot.com'],
+      associatedDomains: [`applinks:${chatwootHost}`],
     },
     android: {
       adaptiveIcon: {
@@ -39,7 +43,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         'android.permission.RECORD_AUDIO',
         'android.permission.POST_NOTIFICATIONS',
       ],
-      // Please use the relative path to the google-services.json file
+      // Please use the relative path to the google-services.json file.
       googleServicesFile: process.env.EXPO_PUBLIC_ANDROID_GOOGLE_SERVICES_FILE,
       intentFilters: [
         {
@@ -48,7 +52,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
           data: [
             {
               scheme: 'https',
-              host: 'app.chatwoot.com',
+              host: chatwootHost,
               pathPrefix: '/app/accounts/',
               pathPattern: '/*/conversations/*',
             },
