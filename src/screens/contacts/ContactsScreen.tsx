@@ -47,35 +47,39 @@ const ContactsScreen = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [hasError, setHasError] = useState(false);
 
-  const loadContacts = useCallback(async (searchQuery = '', refreshing = false) => {
-    if (refreshing) {
-      setIsRefreshing(true);
-    } else {
-      setIsLoading(true);
-    }
-    setHasError(false);
+  const loadContacts = useCallback(
+    async (searchQuery = '', refreshing = false) => {
+      if (refreshing) {
+        setIsRefreshing(true);
+      } else {
+        setIsLoading(true);
+      }
+      setHasError(false);
 
-    try {
-      const trimmedQuery = searchQuery.trim();
-      const response = trimmedQuery.length >= 2
-        ? await apiService.get<ContactsResponse>('search/contacts', {
-            params: { q: trimmedQuery, page: 1 },
-          })
-        : await apiService.get<ContactsResponse>('contacts', {
-            params: { page: 1, sort: '-created_at', include_contact_inboxes: false },
-          });
+      try {
+        const trimmedQuery = searchQuery.trim();
+        const response =
+          trimmedQuery.length >= 2
+            ? await apiService.get<ContactsResponse>('search/contacts', {
+                params: { q: trimmedQuery, page: 1 },
+              })
+            : await apiService.get<ContactsResponse>('contacts', {
+                params: { page: 1, sort: '-created_at', include_contact_inboxes: false },
+              });
 
-      const nextContacts = normalizeContacts(response.data);
-      setContacts(nextContacts);
-      dispatch(addContacts({ contacts: nextContacts }));
-    } catch {
-      setHasError(true);
-      setContacts([]);
-    } finally {
-      setIsLoading(false);
-      setIsRefreshing(false);
-    }
-  }, [dispatch]);
+        const nextContacts = normalizeContacts(response.data);
+        setContacts(nextContacts);
+        dispatch(addContacts({ contacts: nextContacts }));
+      } catch {
+        setHasError(true);
+        setContacts([]);
+      } finally {
+        setIsLoading(false);
+        setIsRefreshing(false);
+      }
+    },
+    [dispatch],
+  );
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -112,9 +116,7 @@ const ContactsScreen = () => {
 
       <View style={tailwind.style('px-4 pt-3 pb-4 border-b border-blackA-A3')}>
         <Animated.Text
-          style={tailwind.style(
-            'text-[22px] font-inter-semibold-20 text-gray-950 pb-4',
-          )}>
+          style={tailwind.style('text-[22px] font-inter-medium-24 text-gray-950 pb-4')}>
           {i18n.t('SEARCH.SECTIONS.CONTACTS')}
         </Animated.Text>
         <SearchBar
