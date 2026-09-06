@@ -108,7 +108,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       [
         'expo-build-properties',
         {
-          // compileSdk/targetSdk 36 = Expo SDK 54 / RN 0.81 default (Android 16).
+          // compileSdk/targetSdk 36 = Expo SDK 57 / RN 0.86 default (Android 16).
           // notifee (issue #808) needs compileSdk >= 35, satisfied by 36.
           android: {
             minSdkVersion: 24,
@@ -123,6 +123,5 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       './with-notifee-maven-repo.js',
       './with-ios-modular-headers.js',
     ],
-    androidNavigationBar: { backgroundColor: '#011E4F' },
   };
 };
