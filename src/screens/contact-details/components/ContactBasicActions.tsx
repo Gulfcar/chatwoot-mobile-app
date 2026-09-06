@@ -7,16 +7,15 @@ import Animated from 'react-native-reanimated';
 import { Icon } from '@/components-next';
 import { useAppSelector } from '@/hooks';
 import type { TabBarExcludedScreenParamList } from '@/navigation/tabs/AppTabs';
+import { ContactableInboxSelectorSheet } from '@/screens/common/ContactableInboxSelectorSheet';
 import {
-  ContactableInboxSelectorSheet,
+  ContactMessagingService,
   type ContactableInbox,
-} from '@/screens/common/ContactableInboxSelectorSheet';
-import { apiService } from '@/services/APIService';
+} from '@/services/ContactMessagingService';
 import { selectUserId } from '@/store/auth/authSelectors';
 import { ChatIcon, MailIcon, PhoneIcon } from '@/svg-icons';
 import { tailwind } from '@/theme';
 import { useHaptic, useScaleAnimation } from '@/utils';
-import { transformConversation, transformInbox } from '@/utils/camelCaseKeys';
 import { openNumber, openEmail } from '@/utils/urlUtils';
 import { showToast } from '@/utils/toastUtils';
 import i18n from '@/i18n';
@@ -30,14 +29,6 @@ type ContactOption = {
 type ContactOptionProps = {
   option: ContactOption;
   handleOptionPress?: () => void;
-};
-
-type ContactableInboxAPIResponse = {
-  payload?: {
-    inbox: Record<string, unknown>;
-    source_id?: string;
-    sourceId?: string;
-  }[];
 };
 
 const SCREEN_WIDTH = Dimensions.get('screen').width;
@@ -95,6 +86,7 @@ export const ContactBasicActions = (props: ContactBasicActionsProps) => {
   const route = useRoute<RouteProp<TabBarExcludedScreenParamList, 'ContactDetails'>>();
   const currentUserId = useAppSelector(selectUserId);
   const contactId = route.params?.contactId;
+  const conversationId = route.params?.conversationId;
   const [selectorVisible, setSelectorVisible] = useState(false);
   const [isLoadingInboxes, setIsLoadingInboxes] = useState(false);
   const [contactableInboxes, setContactableInboxes] = useState<ContactableInbox[]>([]);
@@ -113,6 +105,14 @@ export const ContactBasicActions = (props: ContactBasicActionsProps) => {
     }
   };
 
+  const openChatScreen = (targetConversationId: number) => {
+    navigation.dispatch(
+      StackActions.replace('ChatScreen', {
+        conversationId: targetConversationId,
+      }),
+    );
+  };
+
   const createConversation = async (inbox: ContactableInbox) => {
     if (!contactId) {
       openSystemSms();
@@ -120,25 +120,13 @@ export const ContactBasicActions = (props: ContactBasicActionsProps) => {
     }
 
     try {
-      const response = await apiService.post('conversations', {
-        contact_id: contactId,
-        inbox_id: inbox.id,
-        source_id: inbox.sourceId,
-        ...(currentUserId ? { assignee_id: currentUserId } : {}),
+      const conversation = await ContactMessagingService.createConversation({
+        contactId,
+        inbox,
+        assigneeId: currentUserId,
       });
-      const rawConversation = response.data?.data || response.data;
-      const conversation = transformConversation(rawConversation);
-
-      if (!conversation.id) {
-        throw new Error('Conversation was created without an id');
-      }
-
       setSelectorVisible(false);
-      navigation.dispatch(
-        StackActions.replace('ChatScreen', {
-          conversationId: conversation.id,
-        }),
-      );
+      openChatScreen(conversation.id);
     } catch {
       showToast({
         message: I18nManager.isRTL
@@ -149,6 +137,11 @@ export const ContactBasicActions = (props: ContactBasicActionsProps) => {
   };
 
   const onMessagePress = async () => {
+    if (conversationId) {
+      openChatScreen(conversationId);
+      return;
+    }
+
     if (!contactId) {
       openSystemSms();
       return;
@@ -159,18 +152,9 @@ export const ContactBasicActions = (props: ContactBasicActionsProps) => {
     setContactableInboxes([]);
 
     try {
-      const response = await apiService.get<ContactableInboxAPIResponse>(
-        `contacts/${contactId}/contactable_inboxes`,
+      const inboxes = (await ContactMessagingService.getContactableInboxes(contactId)).filter(
+        inbox => inbox.sourceId && inbox.channelType !== 'Channel::Email',
       );
-      const inboxes = (response.data.payload || [])
-        .map(entry => {
-          const inbox = transformInbox(entry.inbox) as unknown as ContactableInbox;
-          return {
-            ...inbox,
-            sourceId: entry.source_id || entry.sourceId || '',
-          };
-        })
-        .filter(inbox => inbox.sourceId && inbox.channelType !== 'Channel::Email');
 
       if (!inboxes.length) {
         setSelectorVisible(false);
@@ -201,12 +185,12 @@ export const ContactBasicActions = (props: ContactBasicActionsProps) => {
     }
   };
 
-  if (!email && !phoneNumber) {
+  if (!email && !phoneNumber && !conversationId && !contactId) {
     return null;
   }
 
   const messageLabel = I18nManager.isRTL ? 'رسالة' : 'Message';
-  const messageEnabled = !!contactId || !!phoneNumber;
+  const messageEnabled = !!conversationId || !!contactId || !!phoneNumber;
 
   return (
     <>
