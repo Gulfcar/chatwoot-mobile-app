@@ -33,11 +33,11 @@ type ContactOptionProps = {
 };
 
 type ContactableInboxAPIResponse = {
-  payload?: Array<{
+  payload?: {
     inbox: Record<string, unknown>;
     source_id?: string;
     sourceId?: string;
-  }>;
+  }[];
 };
 
 const SCREEN_WIDTH = Dimensions.get('screen').width;
