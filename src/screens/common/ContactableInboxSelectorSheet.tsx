@@ -100,11 +100,13 @@ export const ContactableInboxSelectorSheet = ({
                       pressed ? 'bg-gray-50' : 'bg-white',
                     )
                   }>
-                  <Animated.Text style={tailwind.style('text-base font-inter-medium-24 text-gray-950')}>
+                  <Animated.Text
+                    style={tailwind.style('text-base font-inter-medium-24 text-gray-950')}>
                     {inbox.name}
                   </Animated.Text>
                   {!!subtitle && (
-                    <Animated.Text style={tailwind.style('pt-1 text-xs font-inter-420-20 text-gray-700')}>
+                    <Animated.Text
+                      style={tailwind.style('pt-1 text-xs font-inter-420-20 text-gray-700')}>
                       {subtitle.replace('Channel::', '')}
                     </Animated.Text>
                   )}
