@@ -13,6 +13,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { selectCurrentState } from '@/store/conversation/conversationHeaderSlice';
 
 import {
+  ContactsIcon,
   ConversationIconFilled,
   ConversationIconOutline,
   InboxIconFilled,
@@ -35,11 +36,15 @@ type TabBarIconsProps = {
 };
 
 const TabBarIcons = ({ focused, route }: TabBarIconsProps) => {
+  const iconColor = focused ? tailwind.color('text-gray-950') : tailwind.color('text-gray-700');
+
   switch (route.name) {
     case 'Conversations':
       return focused ? <ConversationIconFilled /> : <ConversationIconOutline />;
     case 'Inbox':
       return focused ? <InboxIconFilled /> : <InboxIconOutline />;
+    case 'Contacts':
+      return <ContactsIcon stroke={iconColor} />;
     case 'Settings':
       return focused ? <SettingsIconFilled /> : <SettingsIconOutline />;
   }
@@ -159,13 +164,13 @@ export const BottomTabBar = ({ state, descriptors, navigation }: BottomTabBarPro
       style={Platform.select({
         ios: [
           tailwind.style(
-            'flex flex-row absolute w-full bottom-0 pl-[72px] pr-[71px] pt-[11px] pb-8 bg-[#00000009]',
+            'flex flex-row absolute w-full bottom-0 px-6 pt-[11px] pb-8 bg-[#00000009]',
             `h-[${tabBarHeight}px]`,
           ),
         ],
         android: [
           tailwind.style(
-            'flex flex-row absolute w-full bottom-0 pl-[72px] pr-[71px] pt-[11px] bg-white',
+            'flex flex-row absolute w-full bottom-0 px-6 pt-[11px] bg-white',
             `h-[${tabBarHeight}px] pb-[${bottom + 11}px]`,
           ),
         ],
