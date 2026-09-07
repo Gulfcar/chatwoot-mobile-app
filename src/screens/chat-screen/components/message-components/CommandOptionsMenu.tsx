@@ -32,9 +32,12 @@ import { selectConversationById } from '@/store/conversation/conversationSelecto
 import { selectInboxById } from '@/store/inbox/inboxSelectors';
 
 export const handleOpenPhotosLibrary = async dispatch => {
+  // Only the first asset is sent (see ReplyBoxContainer), so let the picker
+  // take exactly one. With a higher limit the agent could select several and
+  // watch the rest disappear without a word.
   const pickedAssets = await launchImageLibrary({
     quality: 1,
-    selectionLimit: 4,
+    selectionLimit: 1,
     mediaType: 'mixed',
     presentationStyle: 'formSheet',
   });
