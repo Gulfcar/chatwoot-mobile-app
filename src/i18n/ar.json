@@ -354,7 +354,11 @@
     "NO_INBOX_AVAILABLE": "لا توجد قناة متاحة لبدء محادثة مع جهة الاتصال.",
     "NO_INBOX_TO_MESSAGE": "لا توجد قناة متاحة لبدء رسالة مع جهة الاتصال.",
     "LOAD_INBOXES_FAILED": "تعذر تحميل قنوات التواصل.",
-    "START_CONVERSATION_FAILED": "تعذر بدء المحادثة. حاول مرة أخرى."
+    "START_CONVERSATION_FAILED": "تعذر بدء المحادثة. حاول مرة أخرى.",
+    "CONFIRM_START_TITLE": "بدء محادثة جديدة؟",
+    "CONFIRM_START_BODY": "سيتم بدء محادثة جديدة مع {{contactName}} عبر {{inboxName}}.",
+    "CONFIRM_START_ACTION": "بدء",
+    "CONFIRM_START_CANCEL": "إلغاء"
   },
   "CONVERSATION_PARTICIPANTS": {
     "TITLE": "Participants",

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Dimensions, Linking, Pressable } from 'react-native';
+import { Alert, Dimensions, Linking, Pressable } from 'react-native';
 import { StackActions, useNavigation, useRoute } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
 import Animated from 'react-native-reanimated';
@@ -75,10 +75,11 @@ const ContactOptionComponent = (props: ContactOptionProps) => {
 type ContactBasicActionsProps = {
   phoneNumber?: string;
   email?: string;
+  contactName?: string;
 };
 
 export const ContactBasicActions = (props: ContactBasicActionsProps) => {
-  const { phoneNumber, email } = props;
+  const { phoneNumber, email, contactName } = props;
   const navigation = useNavigation();
   const route = useRoute<RouteProp<TabBarExcludedScreenParamList, 'ContactDetails'>>();
   const currentUserId = useAppSelector(selectUserId);
@@ -131,6 +132,31 @@ export const ContactBasicActions = (props: ContactBasicActionsProps) => {
     }
   };
 
+  // The single-inbox path would otherwise turn one tap into a conversation on
+  // the live instance with nothing to undo it, so name the inbox and ask first.
+  const confirmStartConversation = (inbox: ContactableInbox) =>
+    new Promise<boolean>(resolve => {
+      Alert.alert(
+        i18n.t('CONTACT_DETAILS.CONFIRM_START_TITLE'),
+        i18n.t('CONTACT_DETAILS.CONFIRM_START_BODY', {
+          contactName: contactName || phoneNumber || '',
+          inboxName: inbox.name,
+        }),
+        [
+          {
+            text: i18n.t('CONTACT_DETAILS.CONFIRM_START_CANCEL'),
+            style: 'cancel',
+            onPress: () => resolve(false),
+          },
+          {
+            text: i18n.t('CONTACT_DETAILS.CONFIRM_START_ACTION'),
+            onPress: () => resolve(true),
+          },
+        ],
+        { cancelable: true, onDismiss: () => resolve(false) },
+      );
+    });
+
   const onMessagePress = async () => {
     if (conversationId) {
       openChatScreen(conversationId);
@@ -161,7 +187,11 @@ export const ContactBasicActions = (props: ContactBasicActionsProps) => {
 
       if (inboxes.length === 1) {
         setSelectorVisible(false);
-        await createConversation(inboxes[0]);
+
+        if (await confirmStartConversation(inboxes[0])) {
+          await createConversation(inboxes[0]);
+        }
+
         return;
       }
 

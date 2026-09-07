@@ -387,7 +387,11 @@
     "NO_INBOX_AVAILABLE": "No inbox is available to start a conversation with this contact.",
     "NO_INBOX_TO_MESSAGE": "No inbox is available to message this contact.",
     "LOAD_INBOXES_FAILED": "Unable to load contactable inboxes.",
-    "START_CONVERSATION_FAILED": "Unable to start the conversation. Please try again."
+    "START_CONVERSATION_FAILED": "Unable to start the conversation. Please try again.",
+    "CONFIRM_START_TITLE": "Start a new conversation?",
+    "CONFIRM_START_BODY": "This starts a new conversation with {{contactName}} through {{inboxName}}.",
+    "CONFIRM_START_ACTION": "Start",
+    "CONFIRM_START_CANCEL": "Cancel"
   },
   "CONVERSATION_PARTICIPANTS": {
     "TITLE": "Participants",
