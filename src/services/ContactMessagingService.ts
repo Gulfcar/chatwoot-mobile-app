@@ -45,15 +45,15 @@ const normalizeContacts = (response: ContactsAPIResponse): Contact[] => {
 };
 
 export class ContactMessagingService {
-  static async getContacts(searchQuery = ''): Promise<Contact[]> {
+  static async getContacts(searchQuery = '', page = 1): Promise<Contact[]> {
     const trimmedQuery = searchQuery.trim();
     const response =
       trimmedQuery.length >= 2
         ? await apiService.get<ContactsAPIResponse>('search/contacts', {
-            params: { q: trimmedQuery, page: 1 },
+            params: { q: trimmedQuery, page },
           })
         : await apiService.get<ContactsAPIResponse>('contacts', {
-            params: { page: 1, sort: '-created_at', include_contact_inboxes: false },
+            params: { page, sort: '-created_at', include_contact_inboxes: false },
           });
 
     return normalizeContacts(response.data);
