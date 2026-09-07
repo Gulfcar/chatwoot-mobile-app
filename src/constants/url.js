@@ -2,7 +2,9 @@ export const URL_TYPE = 'https://';
 
 export const API_URL = 'api/v1/';
 
-export const HELP_URL = 'https://www.chatwoot.com/help-center';
+// Set EXPO_PUBLIC_HELP_CENTER_URL to your own docs; the Settings row is
+// hidden when it is empty rather than falling back to a vendor URL.
+export const HELP_URL = process.env.EXPO_PUBLIC_HELP_CENTER_URL || '';
 
 export const GRAVATAR_URL = 'https://www.gravatar.com/avatar/';
 
