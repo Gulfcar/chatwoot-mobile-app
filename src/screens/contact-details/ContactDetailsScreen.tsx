@@ -30,6 +30,8 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { TabBarExcludedScreenParamList } from '@/navigation/tabs/AppTabs';
 import { selectConversationById } from '@/store/conversation/conversationSelectors';
 import { useAppDispatch, useAppSelector } from '@/hooks';
+import { selectUser } from '@/store/auth/authSelectors';
+import { maskPhoneNumber, shouldMaskContactNumbers } from '@/utils/privacyUtils';
 import { contactLabelActions } from '@/store/contact/contactLabelActions';
 import { getContactCustomAttributes } from '@/store/custom-attribute/customAttributeSlice';
 import { selectContactById } from '@/store/contact/contactSelectors';
@@ -155,6 +157,11 @@ const ContactDetailsScreen = (props: ContactDetailsScreenProps) => {
     telegramUsername,
   } = contact?.additionalAttributes || {};
 
+  const user = useAppSelector(selectUser);
+  const maskNumbers = shouldMaskContactNumbers(user, user?.account_id ?? null);
+  const displayedPhoneNumber =
+    maskNumbers && phoneNumber ? maskPhoneNumber(phoneNumber) : phoneNumber;
+
   const contactCustomAttributes = useAppSelector(getContactCustomAttributes);
 
   const usedContactCustomAttributes = processContactAttributes(
@@ -201,7 +208,7 @@ const ContactDetailsScreen = (props: ContactDetailsScreenProps) => {
     },
     {
       icon: <CallIcon />,
-      subtitle: phoneNumber || i18n.t('CONTACT_DETAILS.VALUE_UNAVAILABLE'),
+      subtitle: displayedPhoneNumber || i18n.t('CONTACT_DETAILS.VALUE_UNAVAILABLE'),
       title: i18n.t('CONTACT_DETAILS.PHONE'),
       subtitleType: 'dark',
     },

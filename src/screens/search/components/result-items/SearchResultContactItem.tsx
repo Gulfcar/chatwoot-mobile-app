@@ -7,6 +7,9 @@ import { tailwind } from '@/theme';
 import type { Contact } from '@/types/Contact';
 import { HighlightedText } from '../shared/HighlightedText';
 import { useScaleAnimation } from '@/utils';
+import { useAppSelector } from '@/hooks';
+import { selectUser } from '@/store/auth/authSelectors';
+import { maskPhoneNumber, shouldMaskContactNumbers } from '@/utils/privacyUtils';
 
 type SearchResultContactItemProps = {
   contact: Contact;
@@ -21,6 +24,9 @@ export const SearchResultContactItem = ({
   onPress,
   isLast = false,
 }: SearchResultContactItemProps) => {
+  const user = useAppSelector(selectUser);
+  const maskNumbers = shouldMaskContactNumbers(user, user?.account_id ?? null);
+
   const city = contact.additionalAttributes?.city;
   const country = contact.additionalAttributes?.country;
 
@@ -46,7 +52,7 @@ export const SearchResultContactItem = ({
     if (contact.phoneNumber) {
       items.push({
         type: 'text',
-        content: contact.phoneNumber,
+        content: maskNumbers ? maskPhoneNumber(contact.phoneNumber) : contact.phoneNumber,
         isHighlighted: true,
       });
     }
@@ -64,7 +70,7 @@ export const SearchResultContactItem = ({
     }
 
     return items;
-  }, [contact.email, contact.phoneNumber, formattedLocation]);
+  }, [contact.email, contact.phoneNumber, formattedLocation, maskNumbers]);
 
   return (
     <Pressable

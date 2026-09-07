@@ -15,18 +15,27 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Avatar } from '@/components-next/common';
 import { SearchBar } from '@/components-next/common/search';
 import { TAB_BAR_HEIGHT } from '@/constants';
-import { useAppDispatch } from '@/hooks';
+import { useAppDispatch, useAppSelector } from '@/hooks';
 import i18n from 'i18n';
 import { ContactMessagingService } from '@/services/ContactMessagingService';
 import { addContact, addContacts } from '@/store/contact/contactSlice';
+import { selectUser } from '@/store/auth/authSelectors';
+import { maskPhoneNumber, shouldMaskContactNumbers } from '@/utils/privacyUtils';
 import { tailwind } from '@/theme';
 import type { Contact } from '@/types/Contact';
 
-const getSubtitle = (contact: Contact) =>
-  contact.phoneNumber || contact.email || contact.additionalAttributes?.companyName || '';
+const getSubtitle = (contact: Contact, maskNumbers: boolean) => {
+  if (contact.phoneNumber) {
+    return maskNumbers ? maskPhoneNumber(contact.phoneNumber) : contact.phoneNumber;
+  }
+
+  return contact.email || contact.additionalAttributes?.companyName || '';
+};
 
 const ContactsScreen = () => {
   const dispatch = useAppDispatch();
+  const user = useAppSelector(selectUser);
+  const maskNumbers = shouldMaskContactNumbers(user, user?.account_id ?? null);
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [query, setQuery] = useState('');
@@ -174,8 +183,10 @@ const ContactsScreen = () => {
           ) : null
         }
         renderItem={({ item }) => {
-          const name = item.name || item.phoneNumber || item.email || `#${item.id}`;
-          const subtitle = getSubtitle(item);
+          // A contact with no name falls back to its number, so mask that too.
+          const fallbackNumber = maskNumbers ? maskPhoneNumber(item.phoneNumber) : item.phoneNumber;
+          const name = item.name || fallbackNumber || item.email || `#${item.id}`;
+          const subtitle = getSubtitle(item, maskNumbers);
 
           return (
             <Pressable
