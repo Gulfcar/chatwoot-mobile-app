@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 
 import { EMAIL_REGEX } from '@/constants';
-import { EyeIcon, EyeSlash, LockIcon } from '@/svg-icons';
+import { EyeIcon, EyeSlash, LockIcon, SettingsIconOutline } from '@/svg-icons';
 import { tailwind } from '@/theme';
 import i18n from '@/i18n';
 import { resetAuth } from '@/store/auth/authSlice';
@@ -127,6 +127,19 @@ const LoginScreen = () => {
         barStyle={'dark-content'}
       />
       <View style={tailwind.style('flex-1 bg-white')}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={i18n.t('LOGIN.CHANGE_URL')}
+          hitSlop={12}
+          onPress={openConfigInstallationURL}
+          style={({ pressed }) =>
+            tailwind.style(
+              'absolute top-2 right-3 z-10 rounded-full p-1',
+              pressed ? 'bg-gray-100' : '',
+            )
+          }>
+          <SettingsIconOutline />
+        </Pressable>
         <KeyboardAwareScrollView
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
@@ -268,13 +281,6 @@ const LoginScreen = () => {
 
           <Pressable
             style={tailwind.style('flex-row justify-center items-center mt-6')}
-            onPress={openConfigInstallationURL}>
-            <Animated.Text style={tailwind.style('text-sm text-gray-900')}>
-              {i18n.t('LOGIN.CHANGE_URL')}
-            </Animated.Text>
-          </Pressable>
-          <Pressable
-            style={tailwind.style('flex-row justify-center items-center mt-4')}
             onPress={() => languagesModalSheetRef.current?.present()}>
             <Animated.Text style={tailwind.style('text-sm text-gray-900')}>
               {i18n.t('LOGIN.CHANGE_LANGUAGE')}
