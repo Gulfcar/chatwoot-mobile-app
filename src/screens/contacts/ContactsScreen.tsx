@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -33,6 +33,12 @@ const ContactsScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  // Guards against a second page request while one is already in flight; state
+  // updates are async and onEndReached can fire several times per scroll.
+  const pageRef = useRef(1);
+  const isFetchingRef = useRef(false);
 
   const loadContacts = useCallback(
     async (searchQuery = '', refreshing = false) => {
@@ -42,21 +48,59 @@ const ContactsScreen = () => {
         setIsLoading(true);
       }
       setHasError(false);
+      isFetchingRef.current = true;
 
       try {
-        const nextContacts = await ContactMessagingService.getContacts(searchQuery);
+        const nextContacts = await ContactMessagingService.getContacts(searchQuery, 1);
+        pageRef.current = 1;
+        setHasMore(nextContacts.length > 0);
         setContacts(nextContacts);
         dispatch(addContacts({ contacts: nextContacts }));
       } catch {
         setHasError(true);
         setContacts([]);
+        setHasMore(false);
       } finally {
+        isFetchingRef.current = false;
         setIsLoading(false);
         setIsRefreshing(false);
       }
     },
     [dispatch],
   );
+
+  const loadMoreContacts = useCallback(async () => {
+    if (isFetchingRef.current || !hasMore || hasError) {
+      return;
+    }
+
+    isFetchingRef.current = true;
+    setIsLoadingMore(true);
+    const nextPage = pageRef.current + 1;
+
+    try {
+      const nextContacts = await ContactMessagingService.getContacts(query, nextPage);
+
+      if (!nextContacts.length) {
+        setHasMore(false);
+        return;
+      }
+
+      pageRef.current = nextPage;
+      setContacts(current => {
+        const seen = new Set(current.map(contact => contact.id));
+        const unseen = nextContacts.filter(contact => !seen.has(contact.id));
+        return unseen.length ? [...current, ...unseen] : current;
+      });
+      dispatch(addContacts({ contacts: nextContacts }));
+    } catch {
+      // Keep the pages already loaded; the next scroll can retry.
+      setHasMore(false);
+    } finally {
+      isFetchingRef.current = false;
+      setIsLoadingMore(false);
+    }
+  }, [dispatch, hasError, hasMore, query]);
 
   useEffect(() => {
     const timeout = setTimeout(
@@ -120,6 +164,15 @@ const ContactsScreen = () => {
           />
         }
         contentContainerStyle={tailwind.style(`pb-[${TAB_BAR_HEIGHT + 24}px]`)}
+        onEndReached={loadMoreContacts}
+        onEndReachedThreshold={0.4}
+        ListFooterComponent={
+          isLoadingMore ? (
+            <View style={tailwind.style('py-6')}>
+              <ActivityIndicator color={tailwind.color('text-gray-950')} />
+            </View>
+          ) : null
+        }
         renderItem={({ item }) => {
           const name = item.name || item.phoneNumber || item.email || `#${item.id}`;
           const subtitle = getSubtitle(item);
