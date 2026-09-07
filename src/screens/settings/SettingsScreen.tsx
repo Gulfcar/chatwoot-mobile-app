@@ -33,7 +33,7 @@ import { UserAvatar } from './components/UserAvatar';
 
 import { LANGUAGES } from '@/constants';
 import { useRefsContext } from '@/context';
-import { ChatwootIcon, NotificationIcon, SwitchIcon, TranslateIcon } from '@/svg-icons';
+import { ChatIcon, NotificationIcon, SwitchIcon, TranslateIcon } from '@/svg-icons';
 import { GenericListType } from '@/types';
 
 import { useHaptic, useTabBarHeight } from '@/utils';
@@ -233,23 +233,34 @@ const SettingsScreen = () => {
     },
   ];
 
+  // Both rows depend on configuration this deployment may not have: without a
+  // help URL the docs row went to the upstream vendor's site, and without a
+  // website token the support widget never renders, so the row did nothing.
   const supportList: GenericListType[] = [
-    {
-      hasChevron: true,
-      title: i18n.t('SETTINGS.READ_DOCS'),
-      icon: <SwitchIcon />,
-      subtitle: '',
-      subtitleType: 'light',
-      onPressListItem: openHelpCenter,
-    },
-    {
-      hasChevron: true,
-      title: i18n.t('SETTINGS.CHAT_WITH_US'),
-      icon: <ChatwootIcon />,
-      subtitle: '',
-      subtitleType: 'light',
-      onPressListItem: () => toggleWidget(true),
-    },
+    ...(HELP_URL
+      ? [
+          {
+            hasChevron: true,
+            title: i18n.t('SETTINGS.READ_DOCS'),
+            icon: <SwitchIcon />,
+            subtitle: '',
+            subtitleType: 'light' as const,
+            onPressListItem: openHelpCenter,
+          },
+        ]
+      : []),
+    ...(process.env.EXPO_PUBLIC_CHATWOOT_WEBSITE_TOKEN
+      ? [
+          {
+            hasChevron: true,
+            title: i18n.t('SETTINGS.CHAT_WITH_US'),
+            icon: <ChatIcon />,
+            subtitle: '',
+            subtitleType: 'light' as const,
+            onPressListItem: () => toggleWidget(true),
+          },
+        ]
+      : []),
   ];
 
   return (
@@ -287,7 +298,9 @@ const SettingsScreen = () => {
           <SettingsList sectionTitle={i18n.t('SETTINGS.PREFERENCES')} list={preferencesList} />
         </Animated.View>
         <Animated.View style={tailwind.style('pt-6')}>
-          <SettingsList sectionTitle={i18n.t('SETTINGS.SUPPORT')} list={supportList} />
+          {supportList.length > 0 && (
+            <SettingsList sectionTitle={i18n.t('SETTINGS.SUPPORT')} list={supportList} />
+          )}
         </Animated.View>
         <Animated.View style={tailwind.style('pt-6 mx-4')}>
           <Button
