@@ -31,7 +31,7 @@ import { TabBarExcludedScreenParamList } from '@/navigation/tabs/AppTabs';
 import { selectConversationById } from '@/store/conversation/conversationSelectors';
 import { useAppDispatch, useAppSelector } from '@/hooks';
 import { selectUser } from '@/store/auth/authSelectors';
-import { maskPhoneNumber, shouldMaskContactNumbers } from '@/utils/privacyUtils';
+import { maskContactName, maskPhoneNumber, shouldMaskContactNumbers } from '@/utils/privacyUtils';
 import { contactLabelActions } from '@/store/contact/contactLabelActions';
 import { getContactCustomAttributes } from '@/store/custom-attribute/customAttributeSlice';
 import { selectContactById } from '@/store/contact/contactSelectors';
@@ -234,7 +234,7 @@ const ContactDetailsScreen = (props: ContactDetailsScreenProps) => {
         `flex-1 bg-white pt-6 ${Platform.OS === 'android' ? 'pt-12' : 'pt-6'}`,
       )}>
       <ContactDetailsScreenHeader
-        name={name || contactName || ''}
+        name={maskContactName(name || contactName || '', maskNumbers)}
         thumbnail={thumbnail || contactThumbnail || ''}
         bio={description || ''}
       />

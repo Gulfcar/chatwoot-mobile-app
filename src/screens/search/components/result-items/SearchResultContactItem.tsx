@@ -9,7 +9,7 @@ import { HighlightedText } from '../shared/HighlightedText';
 import { useScaleAnimation } from '@/utils';
 import { useAppSelector } from '@/hooks';
 import { selectUser } from '@/store/auth/authSelectors';
-import { maskPhoneNumber, shouldMaskContactNumbers } from '@/utils/privacyUtils';
+import { maskContactName, maskPhoneNumber, shouldMaskContactNumbers } from '@/utils/privacyUtils';
 
 type SearchResultContactItemProps = {
   contact: Contact;
@@ -86,14 +86,14 @@ export const SearchResultContactItem = ({
       <Animated.View style={[animatedStyle, tailwind.style('mt-1')]}>
         <Avatar
           src={contact.thumbnail ? { uri: contact.thumbnail } : undefined}
-          name={contact.name || ''}
+          name={maskContactName(contact.name, maskNumbers)}
           size="md"
         />
       </Animated.View>
       <Animated.View style={tailwind.style('flex-1 ml-3')}>
         <Animated.View style={tailwind.style('flex-row items-center justify-between mb-1.5')}>
           <HighlightedText
-            text={contact.name || ''}
+            text={maskContactName(contact.name, maskNumbers)}
             searchQuery={searchQuery}
             style={tailwind.style(
               'text-sm font-inter-medium-24 leading-[17px] text-gray-950 flex-1',

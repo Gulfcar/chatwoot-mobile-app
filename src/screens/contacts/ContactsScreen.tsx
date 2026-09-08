@@ -20,7 +20,7 @@ import i18n from 'i18n';
 import { ContactMessagingService } from '@/services/ContactMessagingService';
 import { addContact, addContacts } from '@/store/contact/contactSlice';
 import { selectUser } from '@/store/auth/authSelectors';
-import { maskPhoneNumber, shouldMaskContactNumbers } from '@/utils/privacyUtils';
+import { maskContactName, maskPhoneNumber, shouldMaskContactNumbers } from '@/utils/privacyUtils';
 import { tailwind } from '@/theme';
 import type { Contact } from '@/types/Contact';
 
@@ -183,9 +183,14 @@ const ContactsScreen = () => {
           ) : null
         }
         renderItem={({ item }) => {
-          // A contact with no name falls back to its number, so mask that too.
+          // A nameless contact falls back to its number, and Chatwoot also
+          // stores the number as the name, so both paths go through the mask.
           const fallbackNumber = maskNumbers ? maskPhoneNumber(item.phoneNumber) : item.phoneNumber;
-          const name = item.name || fallbackNumber || item.email || `#${item.id}`;
+          const name =
+            maskContactName(item.name, maskNumbers) ||
+            fallbackNumber ||
+            item.email ||
+            `#${item.id}`;
           const subtitle = getSubtitle(item, maskNumbers);
 
           return (

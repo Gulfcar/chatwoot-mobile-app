@@ -33,6 +33,28 @@ export const maskPhoneNumber = (phoneNumber?: string | null): string => {
 };
 
 /**
+ * Chatwoot stores a contact's phone number in `name` when the contact has no
+ * name of its own, so the conversation list and chat header can show a raw
+ * number even though they never read the phone field. Treat a name that is
+ * only digits and phone punctuation as a number.
+ */
+const PHONE_LIKE = /^\+?[0-9][0-9\s\-().]{5,}$/;
+
+export const looksLikePhoneNumber = (value?: string | null): boolean =>
+  PHONE_LIKE.test((value || '').trim());
+
+/** Masks a contact name only when the name is itself a phone number. */
+export const maskContactName = (name?: string | null, shouldMask = true): string => {
+  const value = (name || '').trim();
+
+  if (!shouldMask || !looksLikePhoneNumber(value)) {
+    return name || '';
+  }
+
+  return maskPhoneNumber(value);
+};
+
+/**
  * Administrators keep full visibility; agents see masked numbers.
  * Falls back to masking when the role cannot be resolved.
  */
