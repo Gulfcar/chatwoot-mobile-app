@@ -7,6 +7,9 @@ import { tailwind } from '@/theme';
 import type { Contact } from '@/types/Contact';
 import { HighlightedText } from '../shared/HighlightedText';
 import { useScaleAnimation } from '@/utils';
+import { useAppSelector } from '@/hooks';
+import { selectUser } from '@/store/auth/authSelectors';
+import { maskContactName, maskPhoneNumber, shouldMaskContactNumbers } from '@/utils/privacyUtils';
 
 type SearchResultContactItemProps = {
   contact: Contact;
@@ -21,6 +24,9 @@ export const SearchResultContactItem = ({
   onPress,
   isLast = false,
 }: SearchResultContactItemProps) => {
+  const user = useAppSelector(selectUser);
+  const maskNumbers = shouldMaskContactNumbers(user, user?.account_id ?? null);
+
   const city = contact.additionalAttributes?.city;
   const country = contact.additionalAttributes?.country;
 
@@ -46,7 +52,7 @@ export const SearchResultContactItem = ({
     if (contact.phoneNumber) {
       items.push({
         type: 'text',
-        content: contact.phoneNumber,
+        content: maskNumbers ? maskPhoneNumber(contact.phoneNumber) : contact.phoneNumber,
         isHighlighted: true,
       });
     }
@@ -64,7 +70,7 @@ export const SearchResultContactItem = ({
     }
 
     return items;
-  }, [contact.email, contact.phoneNumber, formattedLocation]);
+  }, [contact.email, contact.phoneNumber, formattedLocation, maskNumbers]);
 
   return (
     <Pressable
@@ -80,14 +86,14 @@ export const SearchResultContactItem = ({
       <Animated.View style={[animatedStyle, tailwind.style('mt-1')]}>
         <Avatar
           src={contact.thumbnail ? { uri: contact.thumbnail } : undefined}
-          name={contact.name || ''}
+          name={maskContactName(contact.name, maskNumbers)}
           size="md"
         />
       </Animated.View>
       <Animated.View style={tailwind.style('flex-1 ml-3')}>
         <Animated.View style={tailwind.style('flex-row items-center justify-between mb-1.5')}>
           <HighlightedText
-            text={contact.name || ''}
+            text={maskContactName(contact.name, maskNumbers)}
             searchQuery={searchQuery}
             style={tailwind.style(
               'text-sm font-inter-medium-24 leading-[17px] text-gray-950 flex-1',

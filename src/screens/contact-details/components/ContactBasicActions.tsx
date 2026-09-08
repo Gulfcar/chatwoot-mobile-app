@@ -9,7 +9,8 @@ import { useAppSelector } from '@/hooks';
 import type { TabBarExcludedScreenParamList } from '@/navigation/tabs/AppTabs';
 import { ContactableInboxSelectorSheet } from '@/screens/common/ContactableInboxSelectorSheet';
 import { ContactMessagingService, type ContactableInbox } from '@/services/ContactMessagingService';
-import { selectUserId } from '@/store/auth/authSelectors';
+import { selectUser, selectUserId } from '@/store/auth/authSelectors';
+import { shouldMaskContactNumbers } from '@/utils/privacyUtils';
 import { ChatIcon, MailIcon, PhoneIcon } from '@/svg-icons';
 import { tailwind } from '@/theme';
 import { useHaptic, useScaleAnimation } from '@/utils';
@@ -83,6 +84,10 @@ export const ContactBasicActions = (props: ContactBasicActionsProps) => {
   const navigation = useNavigation();
   const route = useRoute<RouteProp<TabBarExcludedScreenParamList, 'ContactDetails'>>();
   const currentUserId = useAppSelector(selectUserId);
+  const user = useAppSelector(selectUser);
+  // Handing the number to the dialer or the SMS app puts it back on screen in
+  // full, so masking has to disable those two routes as well.
+  const maskNumbers = shouldMaskContactNumbers(user, user?.account_id ?? null);
   const contactId = route.params?.contactId;
   const conversationId = route.params?.conversationId;
   const [selectorVisible, setSelectorVisible] = useState(false);
@@ -98,7 +103,7 @@ export const ContactBasicActions = (props: ContactBasicActionsProps) => {
   };
 
   const openSystemSms = () => {
-    if (phoneNumber) {
+    if (phoneNumber && !maskNumbers) {
       Linking.openURL(`sms:${phoneNumber}`);
     }
   };
@@ -211,7 +216,9 @@ export const ContactBasicActions = (props: ContactBasicActionsProps) => {
   }
 
   const messageLabel = i18n.t('CONTACT_DETAILS.MESSAGE');
-  const messageEnabled = !!conversationId || !!contactId || !!phoneNumber;
+  // Without a contactId, Message can only fall back to the SMS app, which
+  // would reveal the number; keep it enabled only where a conversation is possible.
+  const messageEnabled = !!conversationId || !!contactId || (!!phoneNumber && !maskNumbers);
 
   return (
     <>
@@ -221,7 +228,7 @@ export const ContactBasicActions = (props: ContactBasicActionsProps) => {
           option={{
             contactType: i18n.t('CONTACT_DETAILS.CALL'),
             icon: <PhoneIcon strokeWidth={2} stroke={tailwind.color('bg-blue-800')} />,
-            disabled: !phoneNumber,
+            disabled: !phoneNumber || maskNumbers,
           }}
           handleOptionPress={onCallPress}
         />

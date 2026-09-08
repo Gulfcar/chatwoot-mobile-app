@@ -16,6 +16,8 @@ import { selectCurrentState, setCurrentState } from '@/store/conversation/conver
 import { setActionState } from '@/store/conversation/conversationActionSlice';
 import { selectInboxById } from '@/store/inbox/inboxSelectors';
 import { selectContactById } from '@/store/contact/contactSelectors';
+import { selectUser } from '@/store/auth/authSelectors';
+import { maskContactName, shouldMaskContactNumbers } from '@/utils/privacyUtils';
 import { selectTypingUsersByConversationId } from '@/store/conversation/conversationTypingSlice';
 import { conversationActions } from '@/store/conversation/conversationActions';
 import { selectAllLabels } from '@/store/label/labelSelectors';
@@ -64,9 +66,11 @@ const StatusComponent = React.memo(() => {
 
 export const ConversationItemContainer = memo((props: ConversationItemContainerProps) => {
   const { conversationItem, index, openedRowIndex } = props;
+  const user = useAppSelector(selectUser);
+  const maskNumbers = shouldMaskContactNumbers(user, user?.account_id ?? null);
   const {
     meta: {
-      sender: { name: senderName, thumbnail: senderThumbnail, id: contactId },
+      sender: { name: rawSenderName, thumbnail: senderThumbnail, id: contactId },
       assignee,
     },
     id,
@@ -83,6 +87,7 @@ export const ConversationItemContainer = memo((props: ConversationItemContainerP
     status,
     additionalAttributes,
   } = conversationItem;
+  const senderName = maskContactName(rawSenderName, maskNumbers);
 
   // Hooks
   const navigation = useNavigation();

@@ -18,6 +18,8 @@ import {
   selectConversationError,
 } from '@/store/conversation/conversationSelectors';
 import { useAppDispatch, useAppSelector } from '@/hooks';
+import { selectUser } from '@/store/auth/authSelectors';
+import { maskContactName, shouldMaskContactNumbers } from '@/utils/privacyUtils';
 import { selectCurrentUserAccountId } from '@/store/auth/authSelectors';
 
 import { notificationActions } from '@/store/notification/notificationAction';
@@ -75,7 +77,9 @@ const ChatScreenWrapper = (props: ChatScreenProps) => {
   const { conversationId } = useChatWindowContext();
   const conversation = useAppSelector(state => selectConversationById(state, conversationId));
 
-  const { meta: { sender: { name = '', thumbnail = '' } = {} } = {} } = conversation || {};
+  const { meta: { sender: { name: rawName = '', thumbnail = '' } = {} } = {} } = conversation || {};
+  const user = useAppSelector(selectUser);
+  const name = maskContactName(rawName, shouldMaskContactNumbers(user, user?.account_id ?? null));
   const { inboxId } = conversation || {};
 
   useEffect(() => {
